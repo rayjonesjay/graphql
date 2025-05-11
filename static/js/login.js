@@ -83,7 +83,7 @@ async function login(usernameOrEmail, password) {
         }
 
         console.log(`jwt from auth/signin --${data.jwt}--`);
-        localStorage.setItem(jwtName, data.jwt);
+        localStorage.setItem("jwt", data.jwt);
         window.location.href = '/profile';
     } catch (error) {
         const errorParagraph = document.getElementById('error-message');

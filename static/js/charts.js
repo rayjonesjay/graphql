@@ -49,3 +49,16 @@ function renderProfile(profile){
         <p>dob: ${profile.dob}</p>
     `
 }
+
+function calculateGrade(grades){
+    let sum = 0;
+    let realLen = 0;
+    for (let i = 0; i < grades.length; i++) {
+        let grade = grades[i].grade;
+        if (grade !== null) {
+            realLen++;
+            sum += parseInt(grade,10);
+        }
+    }
+    return ((sum/realLen) * 100).toFixed(2);
+}

@@ -86,26 +86,76 @@ const query = `
 }
 `;
 
+let userId;
+let nickname;
+let auditRatio;
+let transactions;
+let email;
+let phone;
+let level;
+let grade;
+let data;
+let goItems;
+let jsItems;
+let rustItems;
+let audits;
+let firstName;
+let lastName;
+let gender;
+let dob;
+let country;
+let middleName;
+let skills;
 
+document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem("jwt");
+    data = await fetchGraphQL(token, query)
 
-document.addEventListener('DOMContentLoaded', () => {
+    console.log("<<<<",data);
+
+    const userData =  data.data.user[0];
+    userId = userData.id;
+    nickname = userData.login;
+    auditRatio = userData.auditRatio;
+    transactions = userData.transactions;
+    phone = userData.attrs.phone;
+    email = userData.attrs.email;
+    level = userData.events[0].level;
+    goItems = data.data.goItems;
+    jsItems = data.data.jsItems;
+    rustItems = data.data.rustItems;
+    audits = data.data.user.[0].audits;
+    country = userData.attrs.country;
+    firstName = userData.attrs.firstName;
+    middleName = userData.attrs.middleName;
+    lastName = userData.attrs.lastName;
+    gender = userData.attrs.gender;
+    dob = userData.attrs.dateOfBirth;
+    name = makeFullName(firstName,middleName,lastName);
+    skills = data.data.skill_types[0].transactions_aggregate.nodes;
+
     const user = {
-        name:"Ray Jones Muiruri",
-        nickname:"Ray",
-        shorthand:"RM",
-        email:"rayjaymuiruri@gmail.com",
-        dob:"17/12/20023",
-        gender:"Male",
-        country:"Kenya",
-        phone:"0712345678",
+        id: userId,
+        name,
+        nickname,
+        email,
+        dob,
+        gender,
+        country,
+        phone,
+        firstName,
+        middleName,
+        lastName,
+        level,
+        skills,
     }
 
     const projects = [
-        { name: "Go", progress: "15/28" },
-        { name: "JS", progress: "2/12" },
-        { name: "Rust", progress: "0/5" },
+        {name: "Go", progress: "15/28"},
+        {name: "JS", progress: "2/12"},
+        {name: "Rust", progress: "0/5"},
     ];
-    console.log(projects);
+    // console.log(projects);
 
     const dashboard = {
         xp: "955.55 KB",
@@ -123,15 +173,21 @@ document.addEventListener('DOMContentLoaded', () => {
     // renderMetrics(dashboard);
     // renderXPChart(xpChart);
 
-    const token = localStorage.getItem("jwt");
     renderProfile(user);
     renderProjects(projects);
-    fetchGraphQL(token).then(data => {
-        if (data) {
-            console.log("User data:", data);
-        }
-    });
+
+
 });
+
+function makeFullName(f,m,l){
+    f=f.trim();
+    m=m.trim();
+    l=l.trim();
+    if(m!==""){
+        return `${f} ${m} ${l}`;
+    }
+    return `${f} ${l}`;
+}
 
 async function fetchGraphQL(token, query) {
     try {
@@ -152,7 +208,7 @@ async function fetchGraphQL(token, query) {
         }
 
         const data = await response.json();
-        console.log(">>>>>", data);
+        // console.log("data.user\n", data.data.user[0],typeof(data));
         return data;
     } catch (error) {
         console.error("GraphQL Error:", error);
