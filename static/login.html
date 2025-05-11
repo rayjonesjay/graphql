@@ -7,15 +7,20 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="static/css/style.css">
     </head>
     <!--head end-->
 
     <body>
         <div id="login">
-            <input id="username" type="text" placeholder="username or email">
-            <input id="password" type="password" placeholder="password">
+            <input id="username" type="text" placeholder="username or email" required>
+            <input id="password" type="password" placeholder="password" required>
             <button id="show-password">show password</button>
+            <button id="login-button">login</button>
+            <p id="error-message" class="hidden"></p>
         </div>
     </body>
 
+    <script src="static/js/main.mjs"></script>
+    <script src="static/js/login.js"></script>
 </html>

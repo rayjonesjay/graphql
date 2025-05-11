@@ -1,10 +1,11 @@
 // graphql.js
 import {domain} from "./auth"
+const graphqlUrl = `https://${domain}/api/graphql-engine/v1/graphql`;
 
 async function fetchGraphQL(query, variables = {}) {
     const jwt = localStorage.getItem('jwt');
 
-    const response = await fetch(`https://${domain}/api/graphql-engine/v1/graphql`, {
+    const response = await fetch(graphqlUrl, {
         method: 'POST',
         headers: {
             'Authorization': `Bearer ${jwt}`,
