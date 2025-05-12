@@ -1,18 +1,58 @@
-<!--index-->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>profile</title>
+    <title>Profile Dashboard</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/css/style.css">
 </head>
-    <body>
-        <h1>profile</h1>
-    </body>
-<script src="static/js/login.js"></script>
-<script src="static/js/graphql.js"></script>
-<script src="static/js/auth.js"></script>
-<script src="static/js/charts.js"></script>
+<body>
+<!-- Left Sidebar -->
+<aside class="sidebar sidebar-left">
+    <div class="avatar"></div>
+    <div class="profile">
+        <!-- Left sidebar content -->
+        <h3>Navigation</h3>
+        <ul>
+            <li>Menu Item 1</li>
+            <li>Menu Item 2</li>
+            <li>Menu Item 3</li>
+        </ul>
+    </div>
+    <button id="logout">Log Out</button>
+</aside>
+
+
+
+
+<main class="main-content">
+    <section class="header">
+        <h1>Projects Done</h1>
+    </section>
+
+    <section class="cards" id="projects"></section>
+
+<!--     <section class="metrics" id="performance"></section>-->
+    <!-- <section class="chart" id="xp-chart"></section> -->
+</main>
+
+
+
+
+<!-- Right Sidebar -->
+<aside class="sidebar sidebar-right">
+    <h3>Additional Info</h3>
+    <div class="right-content">
+        <!-- Right sidebar content -->
+        <p>Notifications</p>
+        <p>Stats</p>
+        <p>Quick Links</p>
+    </div>
+</aside>
+
+<script src="/static/js/mock.js"></script>
+<script src="/static/js/charts.js"></script>
+<script src="/static/js/main.js"></script>
+
+</body>
 </html>
