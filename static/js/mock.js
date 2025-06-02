@@ -111,8 +111,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem("jwt");
     data = await fetchGraphQL(token, query)
 
-    console.log("<<<<",data);
-
     const userData =  data.data.user[0];
     userId = userData.id;
     nickname = userData.login;
@@ -155,7 +153,12 @@ document.addEventListener('DOMContentLoaded', async () => {
         {name: "JS", progress: "2/12"},
         {name: "Rust", progress: "0/5"},
     ];
-    // console.log(projects);
+
+    renderProfile(user);
+    renderProjects(projects);
+    renderNotification(audits);
+
+
 
     const dashboard = {
         xp: "955.55 KB",
@@ -172,9 +175,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     // ];
     // renderMetrics(dashboard);
     // renderXPChart(xpChart);
-
-    renderProfile(user);
-    renderProjects(projects);
 
 
 });

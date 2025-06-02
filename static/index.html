@@ -1,28 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Profile Dashboard</title>
+    <title>Graphql Dashboard</title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="/static/css/style.css">
 </head>
 <body>
-<!-- Left Sidebar -->
+
 <aside class="sidebar sidebar-left">
     <div class="avatar"></div>
     <div class="profile">
-        <!-- Left sidebar content -->
-        <h3>Navigation</h3>
-        <ul>
-            <li>Menu Item 1</li>
-            <li>Menu Item 2</li>
-            <li>Menu Item 3</li>
-        </ul>
+
     </div>
     <button id="logout">Log Out</button>
 </aside>
-
-
 
 
 <main class="main-content">
@@ -37,13 +29,27 @@
 </main>
 
 
-
-
 <!-- Right Sidebar -->
 <aside class="sidebar sidebar-right">
-    <h3>Additional Info</h3>
+    <!--   display events like audits here -->
+    <button class="see-notification-button">see audits</button>
+
+    <input type="checkbox" id="notification-toggle" class="hidden-checkbox">
+
+    <label for="notification-toggle" class="notification-overlay-backdrop"></label>
+
+    <div class="notification-popup">
+        <div class="notification-header">
+            <h2>available audits</h2>
+            <label for="notification-toggle" class="close-button">&times;</label>
+        </div>
+        <div class="notification-content">
+            <div class="notification">
+            </div>
+        </div>
+    </div>
+
     <div class="right-content">
-        <!-- Right sidebar content -->
         <p>Notifications</p>
         <p>Stats</p>
         <p>Quick Links</p>
