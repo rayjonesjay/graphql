@@ -106,8 +106,11 @@ let dob;
 let country;
 let middleName;
 let skills;
+let progresses;
 
 document.addEventListener('DOMContentLoaded', async () => {
+    const logoutBtn = document.getElementById('logout')
+    logoutBtn.addEventListener('click', logout)
     const token = localStorage.getItem("jwt");
     data = await fetchGraphQL(token, query)
 
@@ -131,6 +134,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     dob = userData.attrs.dateOfBirth;
     name = makeFullName(firstName,middleName,lastName);
     skills = data.data.skill_types[0].transactions_aggregate.nodes;
+    progresses = userData.progresses;
 
     const user = {
         id: userId,
@@ -151,33 +155,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     const projects = [
         {name: "Go", progress: "15/28"},
         {name: "JS", progress: "2/12"},
-        {name: "Rust", progress: "0/5"},
+        {name: "Go", progress: "15/28"},
+        {name: "JS", progress: "2/12"},
+        {name: "JS", progress: "2/12"},
+        {name: "Go", progress: "15/28"},
     ];
 
     renderProfile(user);
     renderProjects(projects);
     renderNotification(audits);
-
-
-
-    const dashboard = {
-        xp: "955.55 KB",
-        level: 29,
-        grade: 35.98,
-    };
-
-    // const xpChart = [
-    //     { label: "Jan", xp: 120 },
-    //     { label: "Feb", xp: 250 },
-    //     { label: "Mar", xp: 400 },
-    //     { label: "Apr", xp: 700 },
-    //     { label: "May", xp: 955 },
-    // ];
-    // renderMetrics(dashboard);
-    // renderXPChart(xpChart);
-
-
+    renderSkillChart(getTopSkills(skills));
+    renderProgress(progresses);
 });
+
+function formatXP(bytes) {
+    if (bytes >= 1_000_000) {
+        return (bytes / 1_000_000).toFixed(2)+ "MB";
+    } else if (bytes >= 1_000) {
+        return (bytes / 1_000).toFixed(2)+ "KB";
+    } else {
+        return bytes+ "Bytes";
+    }
+}
+
+function getTopSkills(skills, topN = 5) {
+    return [...skills]
+        .sort((a, b) => b.amount - a.amount)
+        .slice(0, Math.min(topN, skills.length));
+}
 
 function makeFullName(f,m,l){
     f=f.trim();
@@ -206,12 +211,10 @@ async function fetchGraphQL(token, query) {
         if (!response.ok) {
             throw new Error("GraphQL Request Failed");
         }
-
         const data = await response.json();
-        // console.log("data.user\n", data.data.user[0],typeof(data));
+        console.log("data>>>",data);
         return data;
     } catch (error) {
-        console.error("GraphQL Error:", error);
         return null;
     }
 }

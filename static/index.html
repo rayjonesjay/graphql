@@ -10,9 +10,7 @@
 
 <aside class="sidebar sidebar-left">
     <div class="avatar"></div>
-    <div class="profile">
-
-    </div>
+    <div class="profile"></div>
     <button id="logout">Log Out</button>
 </aside>
 
@@ -21,44 +19,49 @@
     <section class="header">
         <h1>Projects Done</h1>
     </section>
-
     <section class="cards" id="projects"></section>
 
-<!--     <section class="metrics" id="performance"></section>-->
-    <!-- <section class="chart" id="xp-chart"></section> -->
+    <section class="header">
+        <h1 class="text-2xl font-bold mb-4 text-center">Grade Progress Over Time</h1>
+    </section>
+
+    <section id="grade-graph" class="w-full max-w-4xl mx-auto mt-10">
+        <svg id="grades-svg" width="100%" height="300" viewBox="0 0 800 300" class="bg-gray-100 rounded shadow-md"></svg>
+    </section>
+
+    <section class="header">
+        <h1>Top 5 Skills</h1>
+    </section>
+    <section id="skill-chart"></section>
+
 </main>
 
-
-<!-- Right Sidebar -->
 <aside class="sidebar sidebar-right">
-    <!--   display events like audits here -->
-    <button class="see-notification-button">see audits</button>
-
+    <button class="see-notification-button">Audits</button>
     <input type="checkbox" id="notification-toggle" class="hidden-checkbox">
-
     <label for="notification-toggle" class="notification-overlay-backdrop"></label>
 
     <div class="notification-popup">
+
         <div class="notification-header">
             <h2>available audits</h2>
             <label for="notification-toggle" class="close-button">&times;</label>
         </div>
+
         <div class="notification-content">
             <div class="notification">
             </div>
         </div>
+
+    </div>
+    <div class="right-content">
+        <div id="grade" class="right-boxes"></div>
     </div>
 
-    <div class="right-content">
-        <p>Notifications</p>
-        <p>Stats</p>
-        <p>Quick Links</p>
-    </div>
 </aside>
 
 <script src="/static/js/mock.js"></script>
 <script src="/static/js/charts.js"></script>
-<script src="/static/js/main.js"></script>
 
 </body>
 </html>

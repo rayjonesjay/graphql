@@ -1,7 +1,5 @@
 function renderProjects(projects) {
     const el = document.getElementById("projects");
-
-    // Set title and empty cards container
     el.innerHTML = `
         <div class="cards">
             ${projects.map(p => `
@@ -14,31 +12,11 @@ function renderProjects(projects) {
     `;
 }
 
-function renderMetrics(data) {
-    const el = document.getElementById("performance");
-    el.innerHTML = `
-        <div class="metric"><h3>XP Earned</h3><p>${data.xp}</p></div>
-        <div class="metric"><h3>Level</h3><p>${data.level}</p></div>
-        <div class="metric"><h3>Grade</h3><p>${data.grade}</p></div>
-    `;
-}
-
-function renderXPChart(chartData) {
-    const el = document.getElementById("xp-chart");
-    el.innerHTML = `<h3>XP Progression</h3><svg height="200" width="100%"></svg>`;
-    // placeholder for future SVG implementation
-}
-
 const elProf = document.querySelector(".profile");
 const elAvatar = document.querySelector(".avatar");
-
 function renderProfile(profile){
-    console.log("renderProfile (profile)",profile);
-    console.log("renderProfile (profile.name) ",profile.name);
-
     // take the first letter of each of their names and combine them to form an abbreviation eg: John Doe -> JD
     const abbreviation = makeAbbreviation(profile.name);
-
     elAvatar.innerHTML = `
     <svg class="avatar-svg" viewBox="0 0 120 120">
         <circle cx="60" cy="60" r="50" fill="#75d7f1" />
@@ -73,17 +51,22 @@ function makeAbbreviation(fullName){
     return abbreviation;
 }
 
-function calculateGrade(grades){
-    let sum = 0;
-    let realLen = 0;
-    for (let i = 0; i < grades.length; i++) {
-        let grade = grades[i].grade;
-        if (grade !== null) {
-            realLen++;
-            sum += parseInt(grade,10);
+const gradeDiv = document.getElementById('grade');
+function renderGrade(progresses){
+    const grade = CalculateGrade(progresses);
+    gradeDiv.innerHTML = `
+        <h1>Grade: ${grade}</h1>
+    `
+}
+
+function CalculateGrade(arr) {
+    let totalGrade = 0;
+    for (const p of arr) {
+        if (p.grade !== null && p.path.includes('/kisumu/module')) {
+            totalGrade += p.grade;
         }
     }
-    return ((sum/realLen) * 100).toFixed(2);
+    return totalGrade.toFixed(2);
 }
 
 
@@ -97,7 +80,7 @@ function renderNotification(auditEvents) {
         notificationToggle.checked = !notificationToggle.checked;
     });
 
-    console.log("renderNotification", auditEvents);
+    // console.log("renderNotification", auditEvents);
 
     if (notificationContainer) {
         notificationContainer.innerHTML = '';
@@ -110,10 +93,140 @@ function renderNotification(auditEvents) {
 
     for (let i = 0; i < auditEvents.length; i++) {
         const currentEvent = auditEvents[i];
+        console.log("curr eve",currentEvent);
         const captainLogin = currentEvent.group.captainLogin;
-
+        const paths = currentEvent.group.path.split('/');
+        const code = currentEvent.private.code;
+        const projectName = paths[paths.length-1];
         notificationContainer.innerHTML += `
-            <span>${captainLogin}</span>
+            <span>project: ${projectName} <br> leader: ${captainLogin} <br> code: ${code}</span>
         `;
     }
+}
+
+// render skill chart
+function renderSkillChart(skills, containerId = 'skill-chart') {
+    const svgWidth = skills.length * 60 + 40;
+    const svgHeight = 300;
+    const barWidth = 20;
+    const barGap = 20;
+    const chartBottom = svgHeight - 180;
+    const scale = 1; // 1 unit = 2px
+
+    const abbreviate = label => label.replace('skill_', '').replace('-', ' ').split(' ')
+        .map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+
+    let svg = `<svg class="skill-chart" viewBox="0 0 ${svgWidth} ${svgHeight}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+    <style>
+        .bar { fill: #0193ff; }
+        .label { font-size: 5px; fill: #333; text-anchor: middle; }
+        .value { font-size: 5px; fill: #000; text-anchor: middle; }
+    </style>`;
+
+    skills.forEach((skill, i) => {
+        const barHeight = skill.amount * scale;
+        const x = i * (barWidth + barGap) + 20;
+        const y = chartBottom - barHeight;
+        const label = abbreviate(skill.type);
+
+        svg += `
+            <rect class="bar" x="${x}" y="${y}" width="${barWidth}" height="${barHeight}"/>
+            <text class="value" x="${x + barWidth / 2}" y="${y - 5}">${skill.amount}</text>
+            <text class="label" x="${x + barWidth / 2}" y="${chartBottom + 15}">${label}</text>
+        `;
+    });
+
+    svg += `</svg>`;
+
+    document.getElementById(containerId).innerHTML = svg;
+}
+
+
+function logout(){
+    console.log("logging out");
+    document.cookie = "jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+    localStorage.removeItem('jwt');
+    console.log('logout complete');
+    window.location.href = '/';
+}
+
+function renderProgress(progresses) {
+    const cleaned = progresses
+        .filter(p => p.grade !== null)
+        .map(p => ({
+            date: new Date(p.createdAt),
+            grade: p.grade
+        }))
+        .sort((a, b) => a.date - b.date);
+
+    const minDate = cleaned[0].date;
+    const maxDate = cleaned[cleaned.length - 1].date;
+    const maxGrade = Math.max(...cleaned.map(p => p.grade));
+
+    const svgWidth = 800;
+    const svgHeight = 300;
+    const padding = 50;
+
+    function scaleX(date) {
+        return padding + ((date - minDate) / (maxDate - minDate)) * (svgWidth - 2 * padding);
+    }
+
+    function scaleY(grade) {
+        return svgHeight - padding - (grade / maxGrade) * (svgHeight - 2 * padding);
+    }
+
+    const pathData = "M " + cleaned.map(p => `${scaleX(p.date)} ${scaleY(p.grade)}`).join(" L ");
+
+    const xTicks = 6;
+    const yTicks = Math.ceil(maxGrade / 0.5);
+
+    const xLabels = Array.from({ length: xTicks + 1 }, (_, i) => {
+        const t = minDate.getTime() + (i / xTicks) * (maxDate.getTime() - minDate.getTime());
+        const d = new Date(t);
+        return {
+            x: scaleX(d),
+            label: `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`
+        };
+    });
+
+    const yLabels = Array.from({ length: yTicks + 1 }, (_, i) => {
+        const grade = (i * maxGrade) / yTicks;
+        return {
+            y: scaleY(grade),
+            label: grade.toFixed(1)
+        };
+    });
+
+    const svg = document.getElementById("grades-svg");
+
+    svg.setAttribute("width", svgWidth);
+    svg.setAttribute("height", svgHeight);
+
+    svg.innerHTML = `
+        <!-- Axes -->
+        <line x1="${padding}" y1="${padding}" x2="${padding}" y2="${svgHeight - padding}" stroke="black"/>
+        <line x1="${padding}" y1="${svgHeight - padding}" x2="${svgWidth - padding}" y2="${svgHeight - padding}" stroke="black"/>
+
+        <!-- Y-axis ticks and labels -->
+        ${yLabels.map(({ y, label }) => `
+            <line x1="${padding - 5}" y1="${y}" x2="${padding}" y2="${y}" stroke="black" />
+            <text x="${padding - 10}" y="${y + 4}" font-size="10" text-anchor="end">${label}</text>
+        `).join('')}
+
+        <!-- X-axis ticks and labels -->
+        ${xLabels.map(({ x, label }) => `
+            <line x1="${x}" y1="${svgHeight - padding}" x2="${x}" y2="${svgHeight - padding + 5}" stroke="black" />
+            <text x="${x}" y="${svgHeight - padding + 15}" font-size="10" text-anchor="middle">${label}</text>
+        `).join('')}
+
+        <!-- Line Path -->
+        <path d="${pathData}" fill="none" stroke="#6b21a8" stroke-width="2" />
+
+        <!-- Data Points -->
+        ${cleaned.map(p => `
+            <circle cx="${scaleX(p.date)}" cy="${scaleY(p.grade)}" r="3" fill="#6b21a8">
+                <title>${p.date.toISOString().split('T')[0]}: Grade ${p.grade.toFixed(2)}</title>
+            </circle>
+        `).join("")}
+    `;
 }

@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 	"strings"
@@ -10,8 +9,8 @@ import (
 )
 
 var (
-	Domain = "learn.zone01kisumu.ke"
-	Auth   = fmt.Sprintf("https://%s/auth/signin", Domain)
+// Domain = "learn.zone01kisumu.ke"
+// Auth   = fmt.Sprintf("https://%s/auth/signin", Domain)
 )
 
 type LoginRequest struct {
@@ -70,8 +69,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		bodyBytes, _ := io.ReadAll(resp.Body)
-		fmt.Printf("Auth failed. Status: %d, Body: %s\n", resp.StatusCode, string(bodyBytes))
+		//bodyBytes, _ := io.ReadAll(resp.Body)
+		//fmt.Printf("Auth failed. Status: %d, Body: %s\n", resp.StatusCode, string(bodyBytes))
 		http.Error(w, `{"error":"Authentication failed"}`, http.StatusUnauthorized)
 		return
 	}
@@ -96,8 +95,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	fmt.Println("original:", jwt)
-	fmt.Println("\n\ncookie:", cookieJWT)
+	//fmt.Println("original:", jwt)
+	//fmt.Println("\n\ncookie:", cookieJWT)
 	// this is for local storage
 	lResp := LoginResponse{
 		Jwt:     cookieJWT,
