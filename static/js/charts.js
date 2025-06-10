@@ -151,6 +151,7 @@ function logout(){
 }
 
 function renderProgress(progresses) {
+    // Filter out null grades and sort by date
     const cleaned = progresses
         .filter(p => p.grade !== null)
         .map(p => ({
@@ -158,10 +159,28 @@ function renderProgress(progresses) {
             grade: p.grade
         }))
         .sort((a, b) => a.date - b.date);
+    
+    // If no valid data, exit
+    if (cleaned.length === 0) return;
 
-    const minDate = cleaned[0].date;
-    const maxDate = cleaned[cleaned.length - 1].date;
-    const maxGrade = Math.max(...cleaned.map(p => p.grade));
+    // Ensure XP only increases (cumulative)
+    let cumulativeData = [];
+    let maxGradeSoFar = 0;
+    
+    for (const item of cleaned) {
+        // Only keep points where grade is higher than previous max
+        if (item.grade >= maxGradeSoFar) {
+            maxGradeSoFar = item.grade;
+            cumulativeData.push({
+                date: item.date,
+                grade: maxGradeSoFar
+            });
+        }
+    }
+
+    const minDate = cumulativeData[0].date;
+    const maxDate = cumulativeData[cumulativeData.length - 1].date;
+    const maxGrade = cumulativeData[cumulativeData.length - 1].grade;
 
     const svgWidth = 800;
     const svgHeight = 300;
@@ -175,7 +194,7 @@ function renderProgress(progresses) {
         return svgHeight - padding - (grade / maxGrade) * (svgHeight - 2 * padding);
     }
 
-    const pathData = "M " + cleaned.map(p => `${scaleX(p.date)} ${scaleY(p.grade)}`).join(" L ");
+    const pathData = "M " + cumulativeData.map(p => `${scaleX(p.date)} ${scaleY(p.grade)}`).join(" L ");
 
     const xTicks = 6;
     const yTicks = Math.ceil(maxGrade / 0.5);
@@ -223,7 +242,7 @@ function renderProgress(progresses) {
         <path d="${pathData}" fill="none" stroke="#6b21a8" stroke-width="2" />
 
         <!-- Data Points -->
-        ${cleaned.map(p => `
+        ${cumulativeData.map(p => `
             <circle cx="${scaleX(p.date)}" cy="${scaleY(p.grade)}" r="3" fill="#6b21a8">
                 <title>${p.date.toISOString().split('T')[0]}: Grade ${p.grade.toFixed(2)}</title>
             </circle>

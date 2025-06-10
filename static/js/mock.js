@@ -48,21 +48,21 @@ const query = `
     startAt
     endAt
   }
-  goItems: object(
+  goProjects: object(
     where: {_or: [{type: {_eq: "project"}, attrs: {_contains: {language: "Go"}}}, {type: {_eq: "piscine"}, name: {_ilike: "%Go%"}}]}
     distinct_on: [name]
   ) {
     name
     type
   }
-  jsItems: object(
+  jsProjects: object(
     where: {_or: [{type: {_eq: "project"}, attrs: {_contains: {language: "JavaScript"}}}, {type: {_eq: "piscine"}, name: {_ilike: "%JS%"}}]}
     distinct_on: [name]
   ) {
     name
     type
   }
-  rustItems: object(
+  rustProjects: object(
     where: {_or: [{type: {_eq: "project"}, attrs: {_contains: {language: "rust"}}}, {type: {_eq: "piscine"}, name: {_ilike: "%Rust%"}}]}
     distinct_on: [name]
   ) {
@@ -95,9 +95,9 @@ let phone;
 let level;
 let grade;
 let data;
-let goItems;
-let jsItems;
-let rustItems;
+let goProjects;
+let jsProjects;
+let rustProjects;
 let audits;
 let firstName;
 let lastName;
@@ -107,6 +107,7 @@ let country;
 let middleName;
 let skills;
 let progresses;
+// let currentUser;
 
 document.addEventListener('DOMContentLoaded', async () => {
     const logoutBtn = document.getElementById('logout')
@@ -122,9 +123,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     phone = userData.attrs.phone;
     email = userData.attrs.email;
     level = userData.events[0].level;
-    goItems = data.data.goItems;
-    jsItems = data.data.jsItems;
-    rustItems = data.data.rustItems;
+    goProjects = data.data.goProjects;
+    jsProjects = data.data.jsProjects;
+    rustProjects = data.data.rustProjects;
     audits = data.data.user[0].audits;
     country = userData.attrs.country;
     firstName = userData.attrs.firstName;
@@ -152,14 +153,16 @@ document.addEventListener('DOMContentLoaded', async () => {
         skills,
     }
 
-    const projects = [
-        {name: "Go", progress: "15/28"},
-        {name: "JS", progress: "2/12"},
-        {name: "Go", progress: "15/28"},
-        {name: "JS", progress: "2/12"},
-        {name: "JS", progress: "2/12"},
-        {name: "Go", progress: "15/28"},
-    ];
+    // const projects = [
+    //     {name: "Go", progress: "15/28"},
+    //     {name: "JS", progress: "2/12"},
+    //     {name: "Go", progress: "15/28"},
+    //     {name: "JS", progress: "2/12"},
+    //     {name: "JS", progress: "2/12"},
+    //     {name: "Go", progress: "15/28"},
+    // ];
+
+    const projects = doneProjectsCount(transactions);
 
     renderProfile(user);
     renderProjects(projects);
@@ -167,6 +170,65 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderSkillChart(getTopSkills(skills));
     renderProgress(progresses);
 });
+
+
+function doneProjectsCount(trans) {
+  let transactions = trans.filter(
+    (transaction) => transaction.type === "xp"
+  );
+
+  // Create sets of completed project names for fast lookup
+  let completedProjects = new Set();
+
+  for (let i = 0; i < transactions.length; i++) {
+    if (transactions[i].object && transactions[i].object.name) {
+      completedProjects.add(transactions[i].object.name);
+    }
+  }
+  console.log(completedProjects);
+
+  // Count completed projects for each language
+  let goDone = 0;
+  let goTotal = goProjects.length;
+  for (let i = 0; i < goTotal; i++) {
+    if (completedProjects.has(goProjects[i].name)) {
+      goDone++;
+    }
+  }
+
+  let jsDone = 0;
+  let jsTotal = jsProjects.length;
+  for (let i = 0; i < jsTotal; i++) {
+    if (completedProjects.has(jsProjects[i].name)) {
+      jsDone++;
+    }
+  }
+
+  let rustDone = 0;
+  let rustTotal = rustProjects.length;
+  for (let i = 0; i < rustTotal; i++) {
+    if (completedProjects.has(rustProjects[i].name)) {
+      rustDone++;
+    }
+  }
+
+  // Calculate ratios
+  const goRatio = `${goDone}/${goTotal}`;
+  const jsRatio = `${jsDone}/${jsTotal}`;
+  const rustRatio = `${rustDone}/${rustTotal}`;
+
+  // Calculate total ratio
+  const totalDone = goDone + jsDone + rustDone;
+  const totalProjects = goTotal + jsTotal + rustTotal;
+  const totalRatio = `${totalDone}/${totalProjects}`;
+
+  return[
+    {name: "Go",progress: `${goDone}/${goTotal}`},
+    {name: "JS",progress: `${jsDone}/${jsTotal}`},
+    {name: "Rust",progress: `${rustDone}/${rustTotal}`},
+    {name:"Total",progress: `${totalDone}/${totalProjects}`},
+    ]
+}
 
 function formatXP(bytes) {
     if (bytes >= 1_000_000) {
@@ -188,7 +250,7 @@ function makeFullName(f,m,l){
     f=f.trim();
     m=m.trim();
     l=l.trim();
-    if(m!==""){
+    if(m!=="" && m!==null && m.toLowerCase()!=="n/a"){
         return `${f} ${m} ${l}`;
     }
     return `${f} ${l}`;
