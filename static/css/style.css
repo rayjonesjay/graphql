@@ -241,36 +241,62 @@ body {
 }
 
 @media (max-width: 768px) {
-    .sidebar {
-        position: fixed;
+    .sidebar-left, .sidebar-right {
         width: 250px;
-        transform: translateX(-100%);
     }
-
-    .sidebar-right {
-        transform: translateX(100%);
-    }
-
-    .sidebar.active {
-        transform: translateX(0);
-    }
-
+    
     .main-content {
-        margin: 0 !important;
-        padding: 20px;
+        margin: 0;
+        padding: 15px;
     }
+    
+    .header {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .cards {
+        justify-content: center;
+    }
+    
+    .card {
+        width: 100%;
+        max-width: 300px;
+    }
+}
 
-    .sidebar-toggle {
-        display: flex;
+/* Add smaller screen support */
+@media (max-width: 480px) {
+    .sidebar-left, .sidebar-right {
+        width: 100%;
+        height: auto;
+        position: relative;
+        transform: none;
     }
+    
+    .main-content {
+        padding: 10px;
+    }
+    
+    #skill-chart svg {
+        max-width: 100%;
+        height: auto;
+    }
+    
+    .notification-popup {
+        width: 95%;
+    }
+}
 
-    #left-toggle.active {
-        left: 270px;
-    }
+/* Make sure images and SVGs are responsive */
+img, svg {
+    max-width: 100%;
+    height: auto;
+}
 
-    #right-toggle.active {
-        right: 270px;
-    }
+/* Flexible box sizing for all elements */
+* {
+    box-sizing: border-box;
 }
 
 @keyframes fadeIn {
