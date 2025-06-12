@@ -7,12 +7,46 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/css/profile.css">
 </head>
     <body>
-        <h1>profile</h1>
+        <div class="container">
+            <div class="sidebar">
+                <div class="profile-header">
+                    <div class="avatar"></div>
+                    <div class="profile-info">
+                        <div class="profile"></div>
+                    </div>
+                </div>
+                <button class="logout-btn" id="logout-btn">LOG OUT</button>
+            </div>
+            
+            <div class="main-content">
+                <button class="audits-btn">Audits</button>
+                
+                <div class="section">
+                    <h3>Projects Done</h3>
+                    <div id="projects"></div>
+                </div>
+                
+                <div class="chart-container">
+                    <div id="grades-chart"></div>
+                </div>
+                
+                <div class="section">
+                    <h3>Top 5 Skills</h3>
+                    <div id="skills-chart"></div>
+                </div>
+            </div>
+        </div>
+
+        <script src="static/js/charts.js"></script>
+        <script src="static/js/mock.js"></script>
+        <script>
+            document.getElementById('logout-btn').addEventListener('click', () => {
+                localStorage.removeItem('jwt');
+                window.location.href = '/';
+            });
+        </script>
     </body>
-<script src="static/js/login.js"></script>
-<script src="static/js/graphql.js"></script>
-<script src="static/js/auth.js"></script>
-<script src="static/js/charts.js"></script>
 </html>

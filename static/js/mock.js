@@ -106,6 +106,7 @@ let dob;
 let country;
 let middleName;
 let skills;
+let progresses;
 
 document.addEventListener('DOMContentLoaded', async () => {
     const token = localStorage.getItem("jwt");
@@ -124,13 +125,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     goItems = data.data.goItems;
     jsItems = data.data.jsItems;
     rustItems = data.data.rustItems;
-    audits = data.data.user.[0].audits;
+    audits = userData.audits;
     country = userData.attrs.country;
     firstName = userData.attrs.firstName;
     middleName = userData.attrs.middleName;
     lastName = userData.attrs.lastName;
     gender = userData.attrs.gender;
     dob = userData.attrs.dateOfBirth;
+    progresses = userData.progresses;
     name = makeFullName(firstName,middleName,lastName);
     skills = data.data.skill_types[0].transactions_aggregate.nodes;
 
@@ -151,32 +153,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     const projects = [
-        {name: "Go", progress: "15/28"},
-        {name: "JS", progress: "2/12"},
-        {name: "Rust", progress: "0/5"},
+        {name: "Go", progress: `${goItems.length}/28`},
+        {name: "JS", progress: `${jsItems.length}/12`},
+        {name: "Rust", progress: `${rustItems.length}/5`},
+        {name: "Total", progress: `${goItems.length + jsItems.length + rustItems.length}/45`},
     ];
-    // console.log(projects);
 
     const dashboard = {
         xp: "955.55 KB",
-        level: 29,
-        grade: 35.98,
+        level: level,
+        grade: calculateGrade(progresses),
     };
-
-    // const xpChart = [
-    //     { label: "Jan", xp: 120 },
-    //     { label: "Feb", xp: 250 },
-    //     { label: "Mar", xp: 400 },
-    //     { label: "Apr", xp: 700 },
-    //     { label: "May", xp: 955 },
-    // ];
-    // renderMetrics(dashboard);
-    // renderXPChart(xpChart);
 
     renderProfile(user);
     renderProjects(projects);
-
-
+    renderGradesChart(progresses);
 });
 
 function makeFullName(f,m,l){
@@ -208,10 +199,22 @@ async function fetchGraphQL(token, query) {
         }
 
         const data = await response.json();
-        // console.log("data.user\n", data.data.user[0],typeof(data));
         return data;
     } catch (error) {
         console.error("GraphQL Error:", error);
         return null;
     }
+}
+
+function calculateGrade(grades){
+    let sum = 0;
+    let realLen = 0;
+    for (let i = 0; i < grades.length; i++) {
+        let grade = grades[i].grade;
+        if (grade !== null) {
+            realLen++;
+            sum += parseInt(grade,10);
+        }
+    }
+    return ((sum/realLen)).toFixed(2);
 }
