@@ -44,7 +44,6 @@ loginBtn.addEventListener('click', () => {
         errMsg.style.display = 'none';
     }
     if (!password || !userNameOrEmail) {
-        console.log('Please enter a username and password');
         clearTimeout(errId);
         handler();
         errId = setTimeout(hide, 8000);

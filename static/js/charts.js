@@ -1,3 +1,19 @@
+let totalXP;
+function renderXP(transactions){
+    const el = document.getElementById("grade");
+    el.innerHTML = `
+        <svg width="200" height="100" viewBox="0 0 200 100" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="200" height="100" rx="10" ry="10" fill="#f0f0f0" stroke="#333" stroke-width="2"/>
+            <text x="100" y="40" text-anchor="middle" font-family="Arial" font-size="16" fill="#333">Total XP</text>
+            <text id="total-xp" x="100" y="70" text-anchor="middle" font-family="Arial" font-size="24" font-weight="bold" fill="#4CAF50">0</text>
+        </svg>
+    `
+    totalXP = transactions
+        .filter(tx => tx.type === "xp")
+        .reduce((sum, tx) => sum + tx.amount, 0);
+    document.getElementById('total-xp').textContent = formatXP(totalXP);
+}
+
 function renderProjects(projects) {
     const el = document.getElementById("projects");
     el.innerHTML = `
@@ -159,28 +175,35 @@ function renderProgress(progresses) {
             grade: p.grade
         }))
         .sort((a, b) => a.date - b.date);
-    
+
     // If no valid data, exit
     if (cleaned.length === 0) return;
 
-    // Ensure XP only increases (cumulative)
+    // Create cumulative data by summing grades
     let cumulativeData = [];
-    let maxGradeSoFar = 0;
+    let totalGrade = 0;
+    
+    // Add initial point at 0 on April 8th, 2024
+    cumulativeData.push({
+        date: new Date('2024-04-08'),
+        grade: 0
+    });
     
     for (const item of cleaned) {
-        // Only keep points where grade is higher than previous max
-        if (item.grade >= maxGradeSoFar) {
-            maxGradeSoFar = item.grade;
-            cumulativeData.push({
-                date: item.date,
-                grade: maxGradeSoFar
-            });
-        }
+        totalGrade += item.grade;
+        cumulativeData.push({
+            date: item.date,
+            grade: totalGrade
+        });
     }
 
     const minDate = cumulativeData[0].date;
     const maxDate = cumulativeData[cumulativeData.length - 1].date;
     const maxGrade = cumulativeData[cumulativeData.length - 1].grade;
+
+    // Set fixed Y-axis scale with increments of 10
+    const yMax = Math.ceil(maxGrade / 10) * 10; // Round up to nearest 10
+    const yTicks = yMax / 10; // One tick every 10 units
 
     const svgWidth = 800;
     const svgHeight = 300;
@@ -191,28 +214,27 @@ function renderProgress(progresses) {
     }
 
     function scaleY(grade) {
-        return svgHeight - padding - (grade / maxGrade) * (svgHeight - 2 * padding);
+        return svgHeight - padding - (grade / yMax) * (svgHeight - 2 * padding);
     }
 
     const pathData = "M " + cumulativeData.map(p => `${scaleX(p.date)} ${scaleY(p.grade)}`).join(" L ");
 
     const xTicks = 6;
-    const yTicks = Math.ceil(maxGrade / 0.5);
 
     const xLabels = Array.from({ length: xTicks + 1 }, (_, i) => {
         const t = minDate.getTime() + (i / xTicks) * (maxDate.getTime() - minDate.getTime());
         const d = new Date(t);
         return {
             x: scaleX(d),
-            label: `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}`
+            label: `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`
         };
     });
 
     const yLabels = Array.from({ length: yTicks + 1 }, (_, i) => {
-        const grade = (i * maxGrade) / yTicks;
+        const grade = i * 10; // Fixed increments of 10
         return {
             y: scaleY(grade),
-            label: grade.toFixed(1)
+            label: grade.toFixed(0) // No decimal places
         };
     });
 
@@ -244,8 +266,13 @@ function renderProgress(progresses) {
         <!-- Data Points -->
         ${cumulativeData.map(p => `
             <circle cx="${scaleX(p.date)}" cy="${scaleY(p.grade)}" r="3" fill="#6b21a8">
-                <title>${p.date.toISOString().split('T')[0]}: Grade ${p.grade.toFixed(2)}</title>
+                <title>${p.date.toISOString().split('T')[0]}: Total Grade ${p.grade.toFixed(2)}</title>
             </circle>
         `).join("")}
+
+        <!-- Grid lines -->
+        ${yLabels.map(({ y }) => `
+            <line x1="${padding}" y1="${y}" x2="${svgWidth - padding}" y2="${y}" stroke="#ddd" stroke-dasharray="2,2" />
+        `).join('')}
     `;
 }

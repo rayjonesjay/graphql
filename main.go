@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	var port = 8080
+	var port = 9999
 	flag.IntVar(&port, "p", port, "port to listen on")
 	flag.Parse()
 

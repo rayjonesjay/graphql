@@ -8,11 +8,6 @@ import (
 	"time"
 )
 
-var (
-// Domain = "learn.zone01kisumu.ke"
-// Auth   = fmt.Sprintf("https://%s/auth/signin", Domain)
-)
-
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
@@ -25,7 +20,6 @@ type LoginResponse struct {
 }
 
 func LoginHandler(w http.ResponseWriter, r *http.Request) {
-	// CORS headers
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
@@ -40,7 +34,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Parse request body
 	var lr LoginRequest
 	if err := json.NewDecoder(r.Body).Decode(&lr); err != nil {
 		http.Error(w, `{"error":"Invalid request body"}`, http.StatusBadRequest)
@@ -52,7 +45,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Make request to Zone01 auth endpoint
 	req, err := http.NewRequest("POST", "https://learn.zone01kisumu.ke/api/auth/signin", nil)
 	if err != nil {
 		http.Error(w, `{"error":"Error creating request"}`, http.StatusInternalServerError)
@@ -69,9 +61,7 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		//bodyBytes, _ := io.ReadAll(resp.Body)
-		//fmt.Printf("Auth failed. Status: %d, Body: %s\n", resp.StatusCode, string(bodyBytes))
-		http.Error(w, `{"error":"Authentication failed"}`, http.StatusUnauthorized)
+		http.Error(w, `{"error":"Authentication failed: Check your login credentials"}`, http.StatusUnauthorized)
 		return
 	}
 
@@ -95,9 +85,6 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		SameSite: http.SameSiteLaxMode,
 	})
 
-	//fmt.Println("original:", jwt)
-	//fmt.Println("\n\ncookie:", cookieJWT)
-	// this is for local storage
 	lResp := LoginResponse{
 		Jwt:     cookieJWT,
 		Message: "Authentication successful",

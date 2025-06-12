@@ -107,7 +107,6 @@ let country;
 let middleName;
 let skills;
 let progresses;
-// let currentUser;
 
 document.addEventListener('DOMContentLoaded', async () => {
     const logoutBtn = document.getElementById('logout')
@@ -153,15 +152,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         skills,
     }
 
-    // const projects = [
-    //     {name: "Go", progress: "15/28"},
-    //     {name: "JS", progress: "2/12"},
-    //     {name: "Go", progress: "15/28"},
-    //     {name: "JS", progress: "2/12"},
-    //     {name: "JS", progress: "2/12"},
-    //     {name: "Go", progress: "15/28"},
-    // ];
-
     const projects = doneProjectsCount(transactions);
 
     renderProfile(user);
@@ -169,6 +159,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     renderNotification(audits);
     renderSkillChart(getTopSkills(skills));
     renderProgress(progresses);
+    renderXP(transactions);
 });
 
 
@@ -211,16 +202,8 @@ function doneProjectsCount(trans) {
       rustDone++;
     }
   }
-
-  // Calculate ratios
-  const goRatio = `${goDone}/${goTotal}`;
-  const jsRatio = `${jsDone}/${jsTotal}`;
-  const rustRatio = `${rustDone}/${rustTotal}`;
-
-  // Calculate total ratio
   const totalDone = goDone + jsDone + rustDone;
   const totalProjects = goTotal + jsTotal + rustTotal;
-  const totalRatio = `${totalDone}/${totalProjects}`;
 
   return[
     {name: "Go",progress: `${goDone}/${goTotal}`},
@@ -230,14 +213,17 @@ function doneProjectsCount(trans) {
     ]
 }
 
-function formatXP(bytes) {
-    if (bytes >= 1_000_000) {
-        return (bytes / 1_000_000).toFixed(2)+ "MB";
-    } else if (bytes >= 1_000) {
-        return (bytes / 1_000).toFixed(2)+ "KB";
-    } else {
-        return bytes+ "Bytes";
-    }
+
+function formatXP(xp) {
+  if (xp >= 1000000) {
+    return `${(xp / 1000000).toFixed(1)}MB`;
+  } else if (xp >= 1000) {
+    const kbValue = xp / 1000;
+    return kbValue % 1 === 0
+      ? `${Math.floor(kbValue)}kB`
+      : `${kbValue.toFixed(1)}kB`;
+  }
+  return xp.toString();
 }
 
 function getTopSkills(skills, topN = 5) {
