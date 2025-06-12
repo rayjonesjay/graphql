@@ -165,9 +165,19 @@ document.addEventListener('DOMContentLoaded', async () => {
         grade: calculateGrade(progresses),
     };
 
+    // Calculate audit data from transactions
+    const auditsDone = transactions
+        .filter(t => t.type === 'up')
+        .reduce((sum, t) => sum + t.amount, 0);
+    
+    const auditsReceived = transactions
+        .filter(t => t.type === 'down')
+        .reduce((sum, t) => sum + t.amount, 0);
+
     renderProfile(user);
     renderProjects(projects);
     renderGradesChart(progresses);
+    renderAuditChart(auditRatio, auditsDone, auditsReceived);
 });
 
 function makeFullName(f,m,l){

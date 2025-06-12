@@ -23,6 +23,114 @@ function renderMetrics(data) {
     `;
 }
 
+function renderAuditChart(auditRatio, auditsDone, auditsReceived) {
+    const el = document.getElementById("audit-chart");
+    
+    if (!auditRatio || auditRatio === 0) {
+        el.innerHTML = `
+            <h3>Done and Received Audits</h3>
+            <div style="text-align: center; padding: 2rem; color: #b0b0b0;">
+                No audit data available
+            </div>
+        `;
+        return;
+    }
+
+    // Calculate percentages
+    const total = auditsDone + auditsReceived;
+    const donePercentage = total > 0 ? (auditsDone / total) * 100 : 0;
+    const receivedPercentage = total > 0 ? (auditsReceived / total) * 100 : 0;
+
+    // Calculate stroke dash array for the circles
+    const radius = 60;
+    const circumference = 2 * Math.PI * radius;
+    const doneStrokeDasharray = (donePercentage / 100) * circumference;
+    const receivedStrokeDasharray = (receivedPercentage / 100) * circumference;
+    const receivedStrokeDashoffset = -doneStrokeDasharray;
+
+    el.innerHTML = `
+        <h3>Done and Received Audits</h3>
+        <div class="audit-chart-container">
+            <div class="audit-chart">
+                <svg viewBox="0 0 140 140">
+                    <defs>
+                        <linearGradient id="doneGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                        </linearGradient>
+                        <linearGradient id="receivedGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                            <stop offset="0%" style="stop-color:#a855f7;stop-opacity:1" />
+                            <stop offset="100%" style="stop-color:#c084fc;stop-opacity:1" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Background circle -->
+                    <circle
+                        cx="70"
+                        cy="70"
+                        r="${radius}"
+                        fill="none"
+                        stroke="#2a2a3e"
+                        stroke-width="12"
+                    />
+                    
+                    <!-- Done audits circle -->
+                    <circle
+                        cx="70"
+                        cy="70"
+                        r="${radius}"
+                        fill="none"
+                        stroke="url(#doneGradient)"
+                        stroke-width="12"
+                        stroke-linecap="round"
+                        stroke-dasharray="${doneStrokeDasharray} ${circumference}"
+                        stroke-dashoffset="0"
+                    />
+                    
+                    <!-- Received audits circle -->
+                    <circle
+                        cx="70"
+                        cy="70"
+                        r="${radius}"
+                        fill="none"
+                        stroke="url(#receivedGradient)"
+                        stroke-width="12"
+                        stroke-linecap="round"
+                        stroke-dasharray="${receivedStrokeDasharray} ${circumference}"
+                        stroke-dashoffset="${receivedStrokeDashoffset}"
+                    />
+                </svg>
+                
+                <div class="audit-ratio-text">
+                    <div class="audit-ratio-label">Audit Ratio</div>
+                    <div class="audit-ratio-value">${auditRatio.toFixed(1)}</div>
+                </div>
+            </div>
+            
+            <div class="audit-legend">
+                <div class="audit-legend-item">
+                    <div class="audit-legend-color audit-done"></div>
+                    <span>Done: ${formatBytes(auditsDone)} (${donePercentage.toFixed(1)}%)</span>
+                </div>
+                <div class="audit-legend-item">
+                    <div class="audit-legend-color audit-received"></div>
+                    <span>Received: ${formatBytes(auditsReceived)} (${receivedPercentage.toFixed(1)}%)</span>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function formatBytes(bytes) {
+    if (bytes === 0) return '0B';
+    
+    const k = 1024;
+    const sizes = ['B', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + sizes[i];
+}
+
 function renderGradesChart(progressData) {
     const el = document.getElementById("grades-chart");
     

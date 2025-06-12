@@ -66,6 +66,88 @@ body {
     margin-top: 1rem;
 }
 
+.audit-section {
+    background-color: #0f1419;
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+}
+
+.audit-section h3 {
+    margin: 0 0 1.5rem 0;
+    color: #4a9eff;
+    font-size: 1.1rem;
+    font-weight: 600;
+}
+
+.audit-chart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.audit-chart {
+    position: relative;
+    width: 160px;
+    height: 160px;
+}
+
+.audit-chart svg {
+    width: 100%;
+    height: 100%;
+    transform: rotate(-90deg);
+}
+
+.audit-ratio-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.audit-ratio-label {
+    font-size: 0.8rem;
+    color: #b0b0b0;
+    margin-bottom: 0.25rem;
+}
+
+.audit-ratio-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.audit-legend {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+}
+
+.audit-legend-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.audit-legend-color {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+}
+
+.audit-done {
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+
+.audit-received {
+    background: linear-gradient(135deg, #a855f7, #c084fc);
+}
+
 .section {
     background-color: #16213e;
     border-radius: 12px;
@@ -270,6 +352,15 @@ body {
     .chart-svg {
         height: 250px;
     }
+    
+    .audit-chart {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .audit-ratio-value {
+        font-size: 1.3rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -293,5 +384,22 @@ body {
     
     .chart-svg {
         height: 200px;
+    }
+    
+    .audit-section {
+        padding: 1rem;
+    }
+    
+    .audit-chart {
+        width: 120px;
+        height: 120px;
+    }
+    
+    .audit-ratio-value {
+        font-size: 1.2rem;
+    }
+    
+    .audit-legend {
+        font-size: 0.8rem;
     }
 }
